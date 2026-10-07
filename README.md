@@ -70,4 +70,4 @@ Abrir Expo Go en un dispositivo Android y escanear el código QR.
 
 ## Notificación local
 
-![Notificación local](./Notificaciones/notificacion.png)
+![Notificación local](./Notificaciones/Notificacion.png)
