@@ -57,3 +57,17 @@ npx expo start --tunnel
 
 Abrir Expo Go en un dispositivo Android y escanear el código QR.
 
+
+## Video de demostración
+
+[Ver video en YouTube](https://youtube.com/shorts/hHBS_pv7i4Y)
+
+
+## Resultados de tests
+
+![Resultado de los tests](./Resultados_Tests/tests.png)
+
+
+## Notificación local
+
+![Notificación local](./Notificaciones/notificacion.png)
