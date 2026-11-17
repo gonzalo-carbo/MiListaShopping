@@ -1,4 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, {
+  useRef,
+  useState,
+} from 'react';
+
 import {
   View,
   Text,
@@ -12,10 +16,14 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import {
+  CameraView,
+  useCameraPermissions,
+} from 'expo-camera';
+
 import * as ImagePicker from 'expo-image-picker';
+
 import * as Location from 'expo-location';
-import * as Calendar from 'expo-calendar/legacy';
 
 import {
   Contact,
@@ -29,11 +37,23 @@ import {
   requestPermissionsAsync,
 } from 'expo-notifications/build/NotificationPermissions';
 
-import { scheduleNotificationAsync } from 'expo-notifications/build/scheduleNotificationAsync';
-import { setNotificationHandler } from 'expo-notifications/build/NotificationsHandler';
-import { SchedulableTriggerInputTypes } from 'expo-notifications/build/Notifications.types';
+import {
+  scheduleNotificationAsync,
+} from 'expo-notifications/build/scheduleNotificationAsync';
 
-import { Product, useProductStore } from '../stores/productStore';
+import {
+  setNotificationHandler,
+} from 'expo-notifications/build/NotificationsHandler';
+
+import {
+  SchedulableTriggerInputTypes,
+} from 'expo-notifications/build/Notifications.types';
+
+import {
+  Product,
+  useProductStore,
+} from '../stores/productStore';
+
 
 type ContactItem = {
   id: string;
@@ -41,6 +61,7 @@ type ContactItem = {
   phone?: string;
   email?: string;
 };
+
 
 setNotificationHandler({
   handleNotification: async () => ({
@@ -51,490 +72,666 @@ setNotificationHandler({
   }),
 });
 
-export default function AddProductScreen({ navigation }: any) {
-  const [name, setName] = useState('');
-  const [imageUri, setImageUri] = useState<string | undefined>();
 
-  const [showCamera, setShowCamera] = useState(false);
+export default function AddProductScreen({
+  navigation,
+}: any) {
 
-  const [latitude, setLatitude] = useState<number | undefined>();
-  const [longitude, setLongitude] = useState<number | undefined>();
-  const [gettingLocation, setGettingLocation] = useState(false);
+  const [name, setName] =
+    useState('');
 
-  const [contacts, setContacts] = useState<ContactItem[]>([]);
-  const [showContacts, setShowContacts] = useState(false);
-  const [loadingContacts, setLoadingContacts] = useState(false);
+  const [imageUri, setImageUri] =
+    useState<string | null>(null);
 
-  const [supplierName, setSupplierName] = useState<string | undefined>();
-  const [supplierPhone, setSupplierPhone] = useState<string | undefined>();
-  const [supplierEmail, setSupplierEmail] = useState<string | undefined>();
-
-  const [calendarEventCreated, setCalendarEventCreated] =
+  const [showCamera, setShowCamera] =
     useState(false);
 
-  const addProductToStore = useProductStore(
-    (state) => state.addProduct
-  );
+  const [latitude, setLatitude] =
+    useState<number | null>(null);
 
-  const cameraRef = useRef<any>(null);
+  const [longitude, setLongitude] =
+    useState<number | null>(null);
+
+  const [gettingLocation, setGettingLocation] =
+    useState(false);
+
+
+  const [contacts, setContacts] =
+    useState<ContactItem[]>([]);
+
+  const [showContacts, setShowContacts] =
+    useState(false);
+
+  const [loadingContacts, setLoadingContacts] =
+    useState(false);
+
+
+  const [supplierName, setSupplierName] =
+    useState<string | null>(null);
+
+  const [supplierPhone, setSupplierPhone] =
+    useState<string | null>(null);
+
+  const [supplierEmail, setSupplierEmail] =
+    useState<string | null>(null);
+
+
+  const addProductToStore =
+    useProductStore(
+      (state) => state.addProduct
+    );
+
 
   const [
     cameraPermission,
     requestCameraPermission,
   ] = useCameraPermissions();
 
-  // -------------------------
-  // CÁMARA
-  // -------------------------
+
+  const cameraRef =
+    useRef<CameraView>(null);
+
 
   const openCamera = async () => {
+
     if (!cameraPermission?.granted) {
-      const result = await requestCameraPermission();
-
-      if (!result.granted) {
-        Alert.alert(
-          'Permiso denegado',
-          'La aplicación necesita permiso para usar la cámara.'
-        );
-        return;
-      }
-    }
-
-    setShowCamera(true);
-  };
-
-  const takePhoto = async () => {
-    try {
-      if (!cameraRef.current) {
-        return;
-      }
-
-      const photo = await cameraRef.current.takePictureAsync();
-
-      if (photo?.uri) {
-        setImageUri(photo.uri);
-        setShowCamera(false);
-      }
-    } catch (error) {
-      Alert.alert(
-        'Error',
-        'No se pudo tomar la fotografía.'
-      );
-    }
-  };
-
-  // -------------------------
-  // GALERÍA
-  // -------------------------
-
-  const pickImage = async () => {
-    try {
-      const permission =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-      if (!permission.granted) {
-        Alert.alert(
-          'Permiso denegado',
-          'La aplicación necesita permiso para acceder a la galería.'
-        );
-        return;
-      }
 
       const result =
-        await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ['images'],
-          allowsEditing: false,
-          quality: 0.8,
-        });
+        await requestCameraPermission();
+
+
+      if (!result.granted) {
+
+        Alert.alert(
+          'Permiso denegado',
+          'Se necesita permiso para usar la cámara.'
+        );
+
+        return;
+
+      }
+
+    }
+
+
+    setShowCamera(true);
+
+  };
+
+
+  const takePhoto = async () => {
+
+    try {
+
+      const photo =
+        await cameraRef.current
+          ?.takePictureAsync();
+
+
+      if (photo?.uri) {
+
+        setImageUri(
+          photo.uri
+        );
+
+        setShowCamera(false);
+
+      }
+
+    } catch (error) {
+
+      Alert.alert(
+        'Error',
+        'No se pudo tomar la foto.'
+      );
+
+      console.log(error);
+
+    }
+
+  };
+
+
+  const pickImage = async () => {
+
+    try {
+
+      const permission =
+        await ImagePicker
+          .requestMediaLibraryPermissionsAsync();
+
+
+      if (!permission.granted) {
+
+        Alert.alert(
+          'Permiso denegado',
+          'Se necesita permiso para acceder a la galería.'
+        );
+
+        return;
+
+      }
+
+
+      const result =
+        await ImagePicker
+          .launchImageLibraryAsync({
+
+            mediaTypes: ['images'],
+
+            allowsEditing: false,
+
+            quality: 0.8,
+
+          });
+
 
       if (!result.canceled) {
-        setImageUri(result.assets[0].uri);
+
+        setImageUri(
+          result.assets[0].uri
+        );
+
       }
+
     } catch (error) {
+
       Alert.alert(
         'Error',
         'No se pudo seleccionar la imagen.'
       );
+
+      console.log(error);
+
     }
+
   };
 
-  // -------------------------
-  // UBICACIÓN
-  // -------------------------
 
   const getCurrentLocation = async () => {
+
     try {
+
       setGettingLocation(true);
 
-      const permission =
-        await Location.requestForegroundPermissionsAsync();
 
-      if (!permission.granted) {
+      const {
+        status,
+      } =
+        await Location
+          .requestForegroundPermissionsAsync();
+
+
+      if (status !== 'granted') {
+
         Alert.alert(
           'Permiso denegado',
-          'La aplicación necesita permiso para acceder a la ubicación.'
+          'Se necesita permiso para obtener la ubicación.'
         );
 
         return;
+
       }
 
-      const location =
-        await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        });
 
-      setLatitude(location.coords.latitude);
-      setLongitude(location.coords.longitude);
+      const currentLocation =
+        await Location
+          .getCurrentPositionAsync({
+
+            accuracy:
+              Location.Accuracy.Balanced,
+
+          });
+
+
+      setLatitude(
+        currentLocation
+          .coords
+          .latitude
+      );
+
+      setLongitude(
+        currentLocation
+          .coords
+          .longitude
+      );
+
+
+      Alert.alert(
+        'Ubicación obtenida',
+        'La ubicación actual fue asociada al producto.'
+      );
+
     } catch (error) {
+
       Alert.alert(
         'Error',
         'No se pudo obtener la ubicación.'
       );
+
+      console.log(error);
+
     } finally {
+
       setGettingLocation(false);
+
     }
+
   };
 
-  // -------------------------
-  // CONTACTOS
-  // -------------------------
 
   const loadContacts = async () => {
+
     try {
+
       setLoadingContacts(true);
+
 
       let permission =
         await getContactsPermissionsAsync();
 
-      if (!permission.granted) {
+
+      if (permission.status !== 'granted') {
+
         permission =
           await requestContactsPermissionsAsync();
+
       }
 
-      if (!permission.granted) {
+
+      if (permission.status !== 'granted') {
+
         Alert.alert(
           'Permiso denegado',
-          'La aplicación necesita permiso para acceder a los contactos.'
+          'Se necesita permiso para acceder a los contactos.'
         );
 
         return;
+
       }
 
-      const result = await Contact.getAllDetails(
-        [
-          ContactField.FULL_NAME,
-          ContactField.PHONES,
-          ContactField.EMAILS,
-        ],
-        {
-          limit: 500,
-          offset: 0,
-        }
+
+      const data =
+        await Contact.getAllDetails(
+          [
+            ContactField.FULL_NAME,
+            ContactField.PHONES,
+            ContactField.EMAILS,
+          ],
+          {
+            limit: 500,
+            offset: 0,
+          }
+        );
+
+
+      const mappedContacts: ContactItem[] =
+        data
+          .filter(
+            (contact) =>
+              contact.fullName
+          )
+          .map(
+            (contact) => ({
+              id: contact.id,
+
+              name:
+                contact.fullName ??
+                'Sin nombre',
+
+              phone:
+                contact.phones?.[0]
+                  ?.number,
+
+              email:
+                contact.emails?.[0]
+                  ?.address,
+            })
+          );
+
+
+      setContacts(
+        mappedContacts
       );
 
-      const contactItems: ContactItem[] =
-        result.map((contact: any) => ({
-          id: contact.id,
-
-          name:
-            contact.fullName ||
-            'Sin nombre',
-
-          phone:
-            contact.phones &&
-            contact.phones.length > 0
-              ? contact.phones[0].number
-              : undefined,
-
-          email:
-            contact.emails &&
-            contact.emails.length > 0
-              ? contact.emails[0].address
-              : undefined,
-        }));
-
-      setContacts(contactItems);
       setShowContacts(true);
+
     } catch (error) {
-      console.log('Error contactos:', error);
 
       Alert.alert(
         'Error',
         'No se pudieron cargar los contactos.'
       );
+
+      console.log(error);
+
     } finally {
+
       setLoadingContacts(false);
+
     }
+
   };
 
-  const selectContact = (contact: ContactItem) => {
-    setSupplierName(contact.name);
-    setSupplierPhone(contact.phone);
-    setSupplierEmail(contact.email);
+
+  const selectContact = (
+    contact: ContactItem
+  ) => {
+
+    setSupplierName(
+      contact.name
+    );
+
+    setSupplierPhone(
+      contact.phone ?? null
+    );
+
+    setSupplierEmail(
+      contact.email ?? null
+    );
 
     setShowContacts(false);
+
   };
 
-  // -------------------------
-  // CALENDARIO
-  // -------------------------
-
-  const createCalendarReminder = async () => {
-    if (!name.trim()) {
-      Alert.alert(
-        'Producto requerido',
-        'Primero escribí el nombre del producto.'
-      );
-
-      return;
-    }
-
-    try {
-      const permission =
-        await Calendar.requestCalendarPermissionsAsync();
-
-      if (permission.status !== 'granted') {
-        Alert.alert(
-          'Permiso denegado',
-          'La aplicación necesita permiso para acceder al calendario.'
-        );
-
-        return;
-      }
-
-      const calendars =
-        await Calendar.getCalendarsAsync(
-          Calendar.EntityTypes.EVENT
-        );
-
-      const writableCalendar =
-        calendars.find(
-          (calendar: any) =>
-            calendar.allowsModifications
-        );
-
-      if (!writableCalendar) {
-        Alert.alert(
-          'Calendario no disponible',
-          'No se encontró un calendario en el que se puedan crear eventos.'
-        );
-
-        return;
-      }
-
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() + 1);
-
-      const endDate = new Date(
-        startDate.getTime() + 30 * 60 * 1000
-      );
-
-      await Calendar.createEventAsync(
-        writableCalendar.id,
-        {
-          title: `Comprar ${name.trim()}`,
-          notes:
-            'Recordatorio creado desde MiListaShopping',
-          startDate,
-          endDate,
-        }
-      );
-
-      setCalendarEventCreated(true);
-
-      Alert.alert(
-        'Recordatorio creado',
-        `Se creó en el calendario un evento para comprar ${name.trim()} dentro de 24 horas.`
-      );
-    } catch (error) {
-      console.log('Error calendario:', error);
-
-      Alert.alert(
-        'Error',
-        'No se pudo crear el evento en el calendario.'
-      );
-    }
-  };
-
-  // -------------------------
-  // NOTIFICACIÓN
-  // -------------------------
 
   const scheduleNotification = async () => {
+
     try {
-      let permission =
+
+      const permission =
         await getPermissionsAsync();
 
-      if (!permission.granted) {
-        permission =
+
+      let granted =
+        permission.status === 'granted';
+
+
+      if (!granted) {
+
+        const result =
           await requestPermissionsAsync();
+
+        granted =
+          result.status === 'granted';
+
       }
 
-      if (!permission.granted) {
+
+      if (!granted) {
+
+        console.log(
+          'Permiso de notificaciones no concedido.'
+        );
+
         return;
+
       }
+
 
       await scheduleNotificationAsync({
+
         content: {
-          title: 'Compras pendientes',
-          body: 'Recordá revisar tu lista de compras.',
+
+          title:
+            'Lista de compras',
+
+          body:
+            'Tenés productos pendientes en tu lista de compras.',
+
+          sound: 'default',
+
         },
 
         trigger: {
+
           type:
-            SchedulableTriggerInputTypes.TIME_INTERVAL,
+            SchedulableTriggerInputTypes
+              .TIME_INTERVAL,
+
           seconds: 4,
+
         },
+
       });
-    } catch (error) {
+
+
       console.log(
-        'Error al programar notificación:',
+        'Notificación programada correctamente.'
+      );
+
+    } catch (error) {
+
+      console.log(
+        'No se pudo programar la notificación:',
         error
       );
+
     }
+
   };
 
-  // -------------------------
-  // GUARDAR PRODUCTO
-  // -------------------------
 
-  const addProduct = async () => {
-    if (!name.trim()) {
+  const addProduct = () => {
+
+    if (name.trim() === '') {
+
       Alert.alert(
-        'Dato requerido',
+        'Error',
         'Ingresá el nombre del producto.'
       );
 
       return;
+
     }
 
+
     const newProduct: Product = {
-      id: Date.now().toString(),
-      name: name.trim(),
-      imageUri,
-      latitude,
-      longitude,
-      supplierName,
-      supplierPhone,
-      supplierEmail,
-      calendarReminderCreated:
-        calendarEventCreated,
+
+      id:
+        Date.now().toString(),
+
+      name:
+        name.trim(),
+
+      imageUri:
+        imageUri ?? undefined,
+
+      latitude:
+        latitude ?? undefined,
+
+      longitude:
+        longitude ?? undefined,
+
+      supplierName:
+        supplierName ?? undefined,
+
+      supplierPhone:
+        supplierPhone ?? undefined,
+
+      supplierEmail:
+        supplierEmail ?? undefined,
+
     };
 
-    addProductToStore(newProduct);
 
-    await scheduleNotification();
+    addProductToStore(
+      newProduct
+    );
+
+
+    scheduleNotification();
+
 
     Alert.alert(
       'Producto agregado',
-      'El producto se agregó correctamente.'
+      `${newProduct.name} fue agregado a la lista.`
     );
 
+
     setName('');
-    setImageUri(undefined);
-    setLatitude(undefined);
-    setLongitude(undefined);
-    setSupplierName(undefined);
-    setSupplierPhone(undefined);
-    setSupplierEmail(undefined);
-    setCalendarEventCreated(false);
+
+    setImageUri(null);
+
+    setLatitude(null);
+
+    setLongitude(null);
+
+    setSupplierName(null);
+
+    setSupplierPhone(null);
+
+    setSupplierEmail(null);
+
 
     navigation.goBack();
+
   };
 
-  // -------------------------
-  // PANTALLA CÁMARA
-  // -------------------------
 
   if (showCamera) {
+
     return (
-      <View style={styles.cameraContainer}>
+
+      <View
+        style={
+          styles.cameraContainer
+        }
+      >
+
         <CameraView
           ref={cameraRef}
-          style={styles.camera}
           facing="back"
+          style={styles.camera}
         />
 
-        <View style={styles.cameraButtons}>
+
+        <View
+          style={
+            styles.cameraButtons
+          }
+        >
+
           <Button
-            title="Tomar foto"
+            title="Capturar"
             onPress={takePhoto}
           />
 
+
           <Button
             title="Cancelar"
-            onPress={() => setShowCamera(false)}
+            onPress={() =>
+              setShowCamera(false)
+            }
           />
+
         </View>
+
       </View>
+
     );
+
   }
 
-  // -------------------------
-  // PANTALLA NORMAL
-  // -------------------------
 
   return (
+
     <View style={styles.container}>
+
       <Text style={styles.title}>
         Agregar producto
       </Text>
 
+
       <TextInput
         style={styles.input}
-        placeholder="Nombre del producto"
+        placeholder="Ej: Leche"
         value={name}
         onChangeText={setName}
       />
 
-      <View style={styles.buttonSpace}>
+
+      <View style={styles.buttonContainer}>
+
         <Button
           title="Tomar foto"
           onPress={openCamera}
         />
+
       </View>
 
-      <View style={styles.buttonSpace}>
+
+      <View style={styles.buttonContainer}>
+
         <Button
           title="Elegir de galería"
           onPress={pickImage}
         />
+
       </View>
 
+
       {imageUri && (
+
         <Image
-          source={{ uri: imageUri }}
+          source={{
+            uri: imageUri,
+          }}
           style={styles.image}
         />
+
       )}
 
-      <View style={styles.buttonSpace}>
+
+      <View style={styles.buttonContainer}>
+
         <Button
           title={
             gettingLocation
               ? 'Obteniendo ubicación...'
               : 'Obtener ubicación actual'
           }
-          onPress={getCurrentLocation}
-          disabled={gettingLocation}
+          onPress={
+            getCurrentLocation
+          }
+          disabled={
+            gettingLocation
+          }
         />
+
       </View>
 
-      {latitude !== undefined &&
-        longitude !== undefined && (
-          <View style={styles.infoBox}>
-            <Text style={styles.infoTitle}>
-              Ubicación seleccionada:
+
+      {latitude !== null &&
+        longitude !== null && (
+
+          <View
+            style={
+              styles.locationBox
+            }
+          >
+
+            <Text>
+              Ubicación asociada:
             </Text>
 
-            <Text style={styles.infoText}>
-              {latitude.toFixed(6)},{' '}
+            <Text>
+              Latitud:{' '}
+              {latitude.toFixed(6)}
+            </Text>
+
+            <Text>
+              Longitud:{' '}
               {longitude.toFixed(6)}
             </Text>
+
           </View>
+
         )}
 
-      <View style={styles.buttonSpace}>
+
+      <View style={styles.buttonContainer}>
+
         <Button
           title={
             loadingContacts
@@ -544,56 +741,50 @@ export default function AddProductScreen({ navigation }: any) {
           onPress={loadContacts}
           disabled={loadingContacts}
         />
+
       </View>
 
+
       {supplierName && (
-        <View style={styles.infoBox}>
-          <Text style={styles.infoTitle}>
+
+        <View style={styles.supplierBox}>
+
+          <Text style={styles.supplierTitle}>
             Proveedor:
           </Text>
 
-          <Text style={styles.infoText}>
+          <Text>
             {supplierName}
           </Text>
 
+
           {supplierPhone && (
-            <Text style={styles.infoText}>
+
+            <Text>
               Tel: {supplierPhone}
             </Text>
+
           )}
+
 
           {supplierEmail && (
-            <Text style={styles.infoText}>
+
+            <Text>
               Email: {supplierEmail}
             </Text>
+
           )}
+
         </View>
+
       )}
 
-      <View style={styles.buttonSpace}>
-        <Button
-          title={
-            calendarEventCreated
-              ? 'Recordatorio creado'
-              : 'Crear recordatorio en calendario'
-          }
-          onPress={createCalendarReminder}
-          disabled={calendarEventCreated}
-        />
-      </View>
 
-      {calendarEventCreated && (
-        <Text style={styles.calendarText}>
-          ✓ Evento agregado al calendario
-        </Text>
-      )}
+      <Button
+        title="Guardar producto"
+        onPress={addProduct}
+      />
 
-      <View style={styles.saveButton}>
-        <Button
-          title="Guardar producto"
-          onPress={addProduct}
-        />
-      </View>
 
       <Modal
         visible={showContacts}
@@ -602,39 +793,69 @@ export default function AddProductScreen({ navigation }: any) {
           setShowContacts(false)
         }
       >
+
         <View style={styles.modalContainer}>
+
           <Text style={styles.modalTitle}>
             Seleccionar proveedor
           </Text>
 
+
           <FlatList
             data={contacts}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) =>
+              item.id
+            }
             renderItem={({ item }) => (
+
               <TouchableOpacity
-                style={styles.contactItem}
+                style={
+                  styles.contactItem
+                }
                 onPress={() =>
                   selectContact(item)
                 }
               >
-                <Text style={styles.contactName}>
+
+                <Text
+                  style={
+                    styles.contactName
+                  }
+                >
                   {item.name}
                 </Text>
 
+
                 {item.phone && (
-                  <Text style={styles.contactDetail}>
+
+                  <Text
+                    style={
+                      styles.contactDetail
+                    }
+                  >
                     {item.phone}
                   </Text>
+
                 )}
 
+
                 {item.email && (
-                  <Text style={styles.contactDetail}>
+
+                  <Text
+                    style={
+                      styles.contactDetail
+                    }
+                  >
                     {item.email}
                   </Text>
+
                 )}
+
               </TouchableOpacity>
+
             )}
           />
+
 
           <Button
             title="Cancelar"
@@ -642,85 +863,78 @@ export default function AddProductScreen({ navigation }: any) {
               setShowContacts(false)
             }
           />
+
         </View>
+
       </Modal>
+
     </View>
+
   );
+
 }
 
+
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     padding: 20,
-    paddingTop: 40,
+    paddingTop: 50,
   },
 
+
   title: {
-    fontSize: 28,
+    fontSize: 30,
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 30,
   },
+
 
   input: {
     borderWidth: 1,
     borderColor: '#999',
+    padding: 12,
     borderRadius: 6,
-    padding: 10,
-    fontSize: 16,
+    marginBottom: 20,
+  },
+
+
+  buttonContainer: {
     marginBottom: 10,
   },
 
-  buttonSpace: {
-    marginVertical: 5,
-  },
 
   image: {
-    width: 160,
-    height: 160,
+    width: 180,
+    height: 180,
     alignSelf: 'center',
+    marginVertical: 20,
     borderRadius: 8,
-    marginVertical: 10,
   },
 
-  infoBox: {
+
+  locationBox: {
     backgroundColor: '#eeeeee',
-    padding: 10,
+    padding: 12,
     borderRadius: 6,
-    marginVertical: 8,
+    marginBottom: 15,
   },
 
-  infoTitle: {
+
+  supplierBox: {
+    backgroundColor: '#eeeeee',
+    padding: 12,
+    borderRadius: 6,
+    marginBottom: 15,
+  },
+
+
+  supplierTitle: {
     fontWeight: '600',
     marginBottom: 3,
   },
 
-  infoText: {
-    fontSize: 13,
-    color: '#555',
-  },
-
-  calendarText: {
-    textAlign: 'center',
-    marginTop: 5,
-    color: '#555',
-  },
-
-  saveButton: {
-    marginTop: 15,
-  },
-
-  cameraContainer: {
-    flex: 1,
-  },
-
-  camera: {
-    flex: 1,
-  },
-
-  cameraButtons: {
-    padding: 20,
-    gap: 10,
-  },
 
   modalContainer: {
     flex: 1,
@@ -728,12 +942,13 @@ const styles = StyleSheet.create({
     paddingTop: 50,
   },
 
+
   modalTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    marginBottom: 20,
+    fontSize: 26,
     textAlign: 'center',
+    marginBottom: 20,
   },
+
 
   contactItem: {
     padding: 15,
@@ -741,14 +956,33 @@ const styles = StyleSheet.create({
     borderBottomColor: '#dddddd',
   },
 
+
   contactName: {
     fontSize: 17,
     fontWeight: '600',
   },
 
+
   contactDetail: {
     fontSize: 13,
     color: '#666',
-    marginTop: 3,
+    marginTop: 2,
   },
+
+
+  cameraContainer: {
+    flex: 1,
+  },
+
+
+  camera: {
+    flex: 1,
+  },
+
+
+  cameraButtons: {
+    padding: 20,
+    gap: 10,
+  },
+
 });

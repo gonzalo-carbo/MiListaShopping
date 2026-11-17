@@ -17,7 +17,6 @@ export type Product = {
   supplierName?: string;
   supplierPhone?: string;
   supplierEmail?: string;
-  calendarReminderCreated?: boolean;
 };
 
 
