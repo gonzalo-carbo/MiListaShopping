@@ -260,6 +260,7 @@ Se prueban:
 - Eliminación de productos.
 - Actualización de productos.
 
+
 ## Estructura principal
 
 ```text
@@ -291,6 +292,7 @@ src/
 - React Native Testing Library
 - EAS Build
 
+
 ## Prueba en dispositivo real
 
 La aplicación fue probada en un dispositivo Android físico.
@@ -306,9 +308,16 @@ Se verificó correctamente:
 - persistencia de productos,
 - estado global con Zustand.
 
+
 ## Video demostrativo
 
 La entrega incluye un video breve donde se demuestra el funcionamiento de los principales recursos implementados.
+
+Video de demostración de la aplicación:
+
+[Ver video en YouTube](https://youtube.com/shorts/ze6sFlmhESg?si=ZnfpmaL_znZY2BWD)
+
+
 
 
 ## Evidencias
@@ -322,6 +331,9 @@ La entrega incluye un video breve donde se demuestra el funcionamiento de los pr
 La notificación local fue verificada en el dispositivo Android físico.
 
 ![Notificación local](docs/notificacion.png)
+
+
+
 
 
 ## Autor
