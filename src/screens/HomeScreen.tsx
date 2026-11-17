@@ -1,8 +1,4 @@
-import React, {
-  useCallback,
-  useState,
-} from 'react';
-
+import React from 'react';
 import {
   View,
   Text,
@@ -11,20 +7,10 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  Image,
 } from 'react-native';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import {
-  useFocusEffect,
-} from '@react-navigation/native';
-
-const PRODUCTS_KEY = '@productos';
-
-type Product = {
-  id: string;
-  name: string;
-};
+import { useProductStore } from '../stores/productStore';
 
 type Props = {
   navigation: any;
@@ -35,59 +21,18 @@ export default function HomeScreen({
   navigation,
   onLogout,
 }: Props) {
-
-  const [products, setProducts] =
-    useState<Product[]>([]);
-
-  const loadProducts = async () => {
-
-    const savedProducts =
-      await AsyncStorage.getItem(PRODUCTS_KEY);
-
-    if (savedProducts) {
-
-      const list: Product[] =
-        JSON.parse(savedProducts);
-
-      setProducts(list);
-
-    } else {
-
-      setProducts([]);
-
-    }
-  };
-
-  useFocusEffect(
-
-    useCallback(() => {
-
-      loadProducts();
-
-    }, [])
-
+  const products = useProductStore(
+    (state) => state.products
   );
 
-  const deleteProduct = async (id: string) => {
-
-    const updatedProducts =
-      products.filter(
-        (product) => product.id !== id
-      );
-
-    setProducts(updatedProducts);
-
-    await AsyncStorage.setItem(
-      PRODUCTS_KEY,
-      JSON.stringify(updatedProducts)
-    );
-  };
+  const removeProduct = useProductStore(
+    (state) => state.removeProduct
+  );
 
   const confirmDelete = (
     id: string,
     name: string
   ) => {
-
     Alert.alert(
       'Eliminar producto',
       `¿Querés eliminar ${name}?`,
@@ -99,7 +44,7 @@ export default function HomeScreen({
         {
           text: 'Eliminar',
           style: 'destructive',
-          onPress: () => deleteProduct(id),
+          onPress: () => removeProduct(id),
         },
       ]
     );
@@ -107,7 +52,6 @@ export default function HomeScreen({
 
   return (
     <View style={styles.container}>
-
       <Text style={styles.title}>
         Lista de compras
       </Text>
@@ -124,12 +68,97 @@ export default function HomeScreen({
         data={products}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-
           <View style={styles.productItem}>
+            {item.imageUri && (
+              <Image
+                source={{ uri: item.imageUri }}
+                style={styles.productImage}
+              />
+            )}
 
-            <Text style={styles.productText}>
-              {item.name}
-            </Text>
+            <View style={styles.productInfo}>
+              <Text style={styles.productText}>
+                {item.name}
+              </Text>
+
+              {item.latitude !== undefined &&
+                item.longitude !== undefined && (
+                  <View
+                    style={
+                      styles.locationContainer
+                    }
+                  >
+                    <Text
+                      style={styles.infoTitle}
+                    >
+                      Ubicación:
+                    </Text>
+
+                    <Text
+                      style={styles.infoText}
+                    >
+                      {item.latitude.toFixed(6)},{' '}
+                      {item.longitude.toFixed(6)}
+                    </Text>
+                  </View>
+                )}
+
+              {item.supplierName && (
+                <View
+                  style={
+                    styles.supplierContainer
+                  }
+                >
+                  <Text
+                    style={styles.infoTitle}
+                  >
+                    Proveedor:
+                  </Text>
+
+                  <Text
+                    style={styles.infoText}
+                  >
+                    {item.supplierName}
+                  </Text>
+
+                  {item.supplierPhone && (
+                    <Text
+                      style={styles.infoText}
+                    >
+                      Tel: {item.supplierPhone}
+                    </Text>
+                  )}
+
+                  {item.supplierEmail && (
+                    <Text
+                      style={styles.infoText}
+                    >
+                      Email: {item.supplierEmail}
+                    </Text>
+                  )}
+                </View>
+              )}
+
+              {item.calendarReminderCreated && (
+                <View
+                  style={
+                    styles.calendarContainer
+                  }
+                >
+                  <Text
+                    style={styles.infoTitle}
+                  >
+                    Recordatorio:
+                  </Text>
+
+                  <Text
+                    style={styles.infoText}
+                  >
+                    Creado en calendario
+                  </Text>
+                </View>
+              )}
+            </View>
 
             <TouchableOpacity
               style={styles.deleteButton}
@@ -140,22 +169,16 @@ export default function HomeScreen({
                 )
               }
             >
-
               <Text style={styles.deleteText}>
                 Eliminar
               </Text>
-
             </TouchableOpacity>
-
           </View>
-
         )}
         ListEmptyComponent={
-
           <Text style={styles.emptyText}>
             No hay productos cargados.
           </Text>
-
         }
       />
 
@@ -163,13 +186,11 @@ export default function HomeScreen({
         title="Cerrar sesión"
         onPress={onLogout}
       />
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     padding: 20,
@@ -189,7 +210,6 @@ const styles = StyleSheet.create({
 
   productItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     padding: 15,
     backgroundColor: '#eeeeee',
@@ -197,8 +217,43 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
 
+  productImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 6,
+    marginRight: 12,
+  },
+
+  productInfo: {
+    flex: 1,
+  },
+
   productText: {
     fontSize: 18,
+    fontWeight: '600',
+  },
+
+  locationContainer: {
+    marginTop: 6,
+  },
+
+  supplierContainer: {
+    marginTop: 8,
+  },
+
+  calendarContainer: {
+    marginTop: 8,
+  },
+
+  infoTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#555',
+  },
+
+  infoText: {
+    fontSize: 12,
+    color: '#666',
   },
 
   deleteButton: {
@@ -217,5 +272,4 @@ const styles = StyleSheet.create({
     marginTop: 30,
     color: '#777',
   },
-
 });
