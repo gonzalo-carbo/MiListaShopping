@@ -4,6 +4,7 @@ Aplicación móvil desarrollada con **React Native + Expo + TypeScript** para ge
 
 Este proyecto corresponde a la evolución del trabajo práctico anterior, incorporando acceso a recursos nativos del dispositivo, manejo de permisos y estado global con Zustand.
 
+
 ## Funcionalidades
 
 La aplicación permite:
@@ -20,6 +21,7 @@ La aplicación permite:
 - Mantener la lista de productos mediante estado global con Zustand.
 - Persistir los productos utilizando AsyncStorage.
 
+
 ## Recursos nativos utilizados
 
 ### Cámara
@@ -32,6 +34,7 @@ expo-camera
 
 Permite tomar una fotografía directamente desde la aplicación y asociarla al producto.
 
+
 ### Galería
 
 Se utiliza:
@@ -41,6 +44,7 @@ expo-image-picker
 ```
 
 Permite seleccionar una imagen existente en el teléfono.
+
 
 ### Ubicación
 
@@ -53,6 +57,7 @@ expo-location
 La aplicación solicita permiso de ubicación y obtiene las coordenadas actuales del dispositivo.
 
 Las coordenadas quedan asociadas al producto.
+
 
 ### Contactos
 
@@ -69,6 +74,7 @@ Se almacena, cuando está disponible:
 - nombre
 - teléfono
 - correo electrónico
+
 
 ### Calendario
 
@@ -90,6 +96,7 @@ El evento se crea para 24 horas después y tiene una duración de 30 minutos.
 
 Debido a que `expo-calendar` requiere funcionalidad nativa no disponible en Expo Go para esta configuración, la aplicación se ejecuta mediante una **development build de Expo**.
 
+
 ### Notificaciones
 
 Se utiliza:
@@ -99,6 +106,7 @@ expo-notifications
 ```
 
 Luego de agregar un producto se programa una notificación local recordando revisar la lista de compras.
+
 
 ## Manejo de permisos
 
@@ -114,6 +122,7 @@ Los recursos que requieren permisos son:
 - Notificaciones
 
 Si el permiso es rechazado, se muestra un mensaje informando que el recurso no puede utilizarse.
+
 
 ## Estado global
 
@@ -146,6 +155,8 @@ AsyncStorage
 
 De esta manera la lista de productos puede mantenerse almacenada localmente.
 
+
+
 ## Datos asociados a un producto
 
 Un producto puede contener:
@@ -177,6 +188,7 @@ Recordatorio:
 Creado en calendario
 ```
 
+
 ## Instalación
 
 Instalar las dependencias:
@@ -190,6 +202,7 @@ En caso de utilizar una instalación limpia del proyecto también puede utilizar
 ```bash
 npm ci
 ```
+
 
 ## Ejecución
 
@@ -210,6 +223,8 @@ npx expo start --dev-client --tunnel
 
 Luego se abre la aplicación **MiListaShopping** instalada en el dispositivo Android.
 
+
+
 ## Development Build
 
 La development build fue generada utilizando **EAS Build**.
@@ -227,6 +242,63 @@ npx eas-cli@latest build --platform android --profile development
 ```
 
 Esto genera un APK de desarrollo que incluye los módulos nativos necesarios para utilizar recursos como `expo-calendar`.
+
+
+
+
+## Versión alternativa compatible con Expo Go
+
+Además de la versión principal del proyecto, se incluye una rama alternativa llamada `expo-go-compatible`.
+
+Esta rama corresponde a una versión de la aplicación que puede ejecutarse directamente con **Expo Go**.
+
+La versión principal, ubicada en la rama `main`, incluye acceso al calendario mediante `expo-calendar`. Debido a que este recurso requiere funcionalidad nativa no disponible en Expo Go para esta configuración, la rama principal utiliza una **Development Build generada con EAS**.
+
+La rama `expo-go-compatible` mantiene las funcionalidades principales de la aplicación, pero no incluye la integración con calendario.
+
+Permite probar fácilmente:
+
+- Cámara
+- Galería
+- Ubicación GPS
+- Contactos
+- Notificaciones
+- Estado global con Zustand
+- Persistencia local con AsyncStorage
+
+Para ejecutar esta versión:
+
+```bash
+git checkout expo-go-compatible
+npm install
+npx expo start --tunnel
+```
+
+Luego se puede escanear el código QR utilizando **Expo Go** en un dispositivo Android.
+
+
+
+### Resumen de versiones
+
+**Rama `main`**
+
+Versión completa del trabajo práctico.
+
+- Incluye calendario.
+- Utiliza `expo-calendar`.
+- Requiere Development Build.
+- La Development Build fue generada mediante EAS.
+
+**Rama `expo-go-compatible`**
+
+Versión alternativa para facilitar la prueba de la aplicación.
+
+- No incluye calendario.
+- Puede ejecutarse directamente con Expo Go.
+- Mantiene el resto de los recursos implementados.
+
+
+
 
 ## Tests
 
@@ -261,6 +333,7 @@ Se prueban:
 - Actualización de productos.
 
 
+
 ## Estructura principal
 
 ```text
@@ -274,6 +347,7 @@ src/
     └── __tests__/
         └── productStore.test.ts
 ```
+
 
 ## Tecnologías utilizadas
 
@@ -293,6 +367,7 @@ src/
 - EAS Build
 
 
+
 ## Prueba en dispositivo real
 
 La aplicación fue probada en un dispositivo Android físico.
@@ -307,6 +382,7 @@ Se verificó correctamente:
 - notificaciones,
 - persistencia de productos,
 - estado global con Zustand.
+
 
 
 ## Video demostrativo
